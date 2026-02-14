@@ -139,7 +139,7 @@
                 <h2 class="text-3xl font-bold mb-4">Portfolio</h2>
                 <p class="text-secondary mb-12">Selected projects, publications, and achievements.</p>
                 
-                <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="portfolio-grid">
                     </div>
             </div>
         </section>
@@ -189,6 +189,15 @@
             'PM':         { icon: 'zap',       colorClass: 'text-orange-600', bgClass: 'bg-orange-50' },
             'Default':    { icon: 'star',      colorClass: 'text-gray-600', bgClass: 'bg-gray-50' }
         };
+
+        // 분야별 그룹 설정 (표시 순서)
+        const fieldGroups = [
+            { name: '연구 & 논문', icon: 'book-open', colorClass: 'text-indigo-600', bgClass: 'bg-indigo-50', categories: ['Research', 'Paper'] },
+            { name: '수상', icon: 'trophy', colorClass: 'text-yellow-600', bgClass: 'bg-yellow-50', categories: ['Award'] },
+            { name: '대회', icon: 'target', colorClass: 'text-red-600', bgClass: 'bg-red-50', categories: ['Contest'] },
+            { name: '활동', icon: 'users', colorClass: 'text-green-600', bgClass: 'bg-green-50', categories: ['Activity', 'Volunteering'] },
+            { name: '경력', icon: 'briefcase', colorClass: 'text-accent', bgClass: 'bg-blue-50', categories: ['Internship', 'PM'] },
+        ];
 
         // 포트폴리오 데이터 배열
         const portfolioData = [
@@ -269,6 +278,18 @@
                 category: "Award",
                 desc: "Korea Institute of Information Security & Cryptology President's Award",
                 tags: ["AI", "Android","Alzheimer's diagnosis to use voice data"]
+            },
+            {
+                title: "KNU AI Bootcamp Hackathon",
+                category: "Award",
+                desc: "최우수상 (Excellence Award). Team AILerGy.",
+                tags: ["AI", "Hackathon"]
+            },
+            {
+                title: "전국 GoogleCloud 기반 AI 융합 경진대회",
+                category: "Award",
+                desc: "대상 (Grand Prize). AI 기술 융합 프로토타입.",
+                tags: ["Google Cloud", "AI"]
             }
         ];
 
@@ -280,31 +301,47 @@
             const container = document.getElementById('portfolio-grid');
             let html = '';
 
-            portfolioData.forEach(item => {
-                // 설정된 카테고리 스타일 가져오기 (없으면 Default 사용)
-                const config = categoryConfig[item.category] || categoryConfig['Default'];
-                
-                // 태그 HTML 생성
-                const tagsHtml = item.tags.map(tag => 
-                    `<span class="text-xs px-2 py-1 bg-gray-50 border border-gray-100 rounded text-gray-600">${tag}</span>`
-                ).join('');
+            fieldGroups.forEach(group => {
+                const items = portfolioData.filter(item => group.categories.includes(item.category));
+                if (items.length === 0) return;
 
-                // 카드 HTML 생성
+                // 분야 섹션 헤더
                 html += `
-                    <div class="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="p-2 ${config.bgClass} rounded-lg ${config.colorClass}">
-                                <i data-lucide="${config.icon}"></i>
+                    <div class="mb-14">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 ${group.bgClass} rounded-lg ${group.colorClass}">
+                                <i data-lucide="${group.icon}"></i>
                             </div>
-                            <span class="text-xs font-medium text-gray-400">${item.category}</span>
+                            <h3 class="text-xl font-bold">${group.name}</h3>
+                            <span class="text-sm font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">${items.length}</span>
                         </div>
-                        <h3 class="text-lg font-bold mb-2 group-hover:${config.colorClass} transition-colors">${item.title}</h3>
-                        <p class="text-sm text-secondary mb-4 line-clamp-2">${item.desc}</p>
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            ${tagsHtml}
-                        </div>
-                    </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 `;
+
+                items.forEach(item => {
+                    const config = categoryConfig[item.category] || categoryConfig['Default'];
+                    const tagsHtml = item.tags.map(tag =>
+                        `<span class="text-xs px-2 py-1 bg-gray-50 border border-gray-100 rounded text-gray-600">${tag}</span>`
+                    ).join('');
+
+                    html += `
+                        <div class="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-2 ${config.bgClass} rounded-lg ${config.colorClass}">
+                                    <i data-lucide="${config.icon}"></i>
+                                </div>
+                                <span class="text-xs font-medium text-gray-400">${item.category}</span>
+                            </div>
+                            <h3 class="text-lg font-bold mb-2">${item.title}</h3>
+                            <p class="text-sm text-secondary mb-4 line-clamp-2">${item.desc}</p>
+                            <div class="flex flex-wrap gap-2 mt-auto">
+                                ${tagsHtml}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
             });
 
             container.innerHTML = html;
